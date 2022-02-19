@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,4 +20,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('articles', ArticleController::class);
+Route::get('articles', [ArticleController::class, 'index']);
+
+Route::post('register', [UserController::class, 'register']);
+Route::post('login', [UserController::class, 'authenticate']);
+
+Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::get('user', [UserController::class, 'getAuthenticatedUser']);
+    Route::apiResource('articles', ArticleController::class)->except(['index']);
+});
